@@ -1,0 +1,183 @@
+/* --- GLOBAL RESET & SCROLLBAR FIX --- */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* For Firefox, IE, and Edge */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-y: scroll; /* Keeps scrolling enabled */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+/* --- MAIN LAYOUT (FIXED PHONE SIZE) --- */
+.app-container {
+  width: 100%;           /* Fill available space... */
+  max-width: 600px;      /* ...but stop at 600px */
+  margin: 0 auto;        /* Center strictly */
+  min-height: 100vh;
+  background: white;
+  box-shadow: 0 0 20px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  position: relative;    /* Ensures stability */
+}
+
+.content-area {
+  padding: 20px;
+  flex: 1;
+  width: 100%;           /* Force content to fit container */
+  box-sizing: border-box; /* Include padding in width calculation */
+  overflow-x: hidden;    /* Prevent accidental horizontal scrolling */
+}
+
+/* --- NAVIGATION (FIXED) --- */
+.navbar {
+  background: #fff;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 60px;
+  width: 100%;           /* Ensure navbar matches container width */
+  box-sizing: border-box;
+}
+
+.nav-tabs {
+  display: flex;
+  background: #f0f2f5;
+  padding: 4px;
+  border-radius: 8px;
+  gap: 5px;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.nav-btn {
+  flex: 1; /* Forces equal width for all buttons */
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #7f8c8d;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.nav-btn.active {
+  background: white;
+  color: #2c3e50;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  height: 32px;
+  white-space: nowrap;
+}
+
+/* --- CARDS & UI ELEMENTS --- */
+.card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  width: 100%;           /* Force card to fit container */
+  box-sizing: border-box; /* Prevent padding from expanding width */
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* --- FORMS --- */
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background: #fdfdfd;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #3498db;
+  outline: none;
+  background: white;
+}
+
+/* --- BUTTONS --- */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: #2980b9; }
+
+.btn-success { background: #27ae60; color: white; border:none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
+
+/* --- CALENDAR SPECIFIC (FORCE WIDTH) --- */
+.react-calendar {
+  width: 100% !important; /* Force calendar to stay inside */
+  max-width: 100% !important;
+  border: none !important;
+  font-family: inherit !important;
+  background: white !important;
+}
+.working-day { background: #e3f2fd !important; color: #1565c0; font-weight: bold; border-radius: 50%; }
+.holiday { background: #ffebee !important; color: #c62828; text-decoration: line-through; border-radius: 50%; }
+
+/* --- MOBILE SCROLL --- */
+.horizontal-scroll {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: none;
+}
+.horizontal-scroll::-webkit-scrollbar { display: none; }
