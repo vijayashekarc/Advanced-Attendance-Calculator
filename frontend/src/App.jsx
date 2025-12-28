@@ -6,6 +6,15 @@ import TimetableManager from './TimetableManager';
 import AnalysisDashboard from './AnalysisDashboard';
 import './App.css';
 
+const cors = require('cors');
+const app = express();
+
+app.use(cors({
+  origin: 'https://advanced-attendance-calculator-app.vercel.app', // or your specific frontend url
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
+
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [tab, setTab] = useState('dash');
