@@ -6,40 +6,95 @@ export default function TimetableManager() {
   const [newSub, setNewSub] = useState('');
   const [sched, setSched] = useState([]);
 
-  useEffect(() => { load(); }, []);
+  // 1. New State for Page Loading
+  const [pageLoading, setPageLoading] = useState(true);
 
-  const load = async () => {
+  // 2. Wrap initialization in a dedicated async function
+  useEffect(() => {
+    const initPage = async () => {
+        setPageLoading(true);
+
+        // Wait for Fetch AND 2-second timer
+        await Promise.all([
+            load(),
+            new Promise(resolve => setTimeout(resolve, 500))
+        ]);
+
+        setPageLoading(false);
+    };
+    initPage();
+  }, []);
+
+  const load = async (retries = 3) => {
     try {
         const s = await axios.get('/api/subjects/');
         const t = await axios.get('/api/timetable/');
-        setSubs(s.data); setSched(t.data);
-    } catch (e) { console.error(e); }
+        setSubs(s.data); 
+        setSched(t.data);
+    } catch (e) { 
+        // Retry logic (Safety net behind the loading screen)
+        if (e.response && e.response.status === 401 && retries > 0) {
+            setTimeout(() => load(retries - 1), 500);
+        } else {
+            console.error(e); 
+        }
+    }
   };
 
   const addSub = async () => {
     if(!newSub) return;
-    await axios.post('/api/subjects/', {name: newSub});
-    setNewSub(''); load();
+    try {
+        await axios.post('/api/subjects/', {name: newSub});
+        setNewSub(''); 
+        load();
+    } catch (e) { console.error(e); }
   };
 
   const delSub = async (id) => {
-    if(confirm("Delete subject?")) { await axios.delete(`/api/subjects/${id}/`); load(); }
+    if(window.confirm("Delete subject?")) { 
+        try {
+            await axios.delete(`/api/subjects/${id}/`); 
+            load(); 
+        } catch (e) { console.error(e); }
+    }
   };
 
   const addClass = async (day, subId) => {
-    await axios.post('/api/timetable/', {day_of_week: day, subject: subId}); load();
+    try {
+        await axios.post('/api/timetable/', {day_of_week: day, subject: subId}); 
+        load();
+    } catch (e) { console.error(e); }
   };
 
   const delClass = async (id) => {
-    await axios.delete(`/api/timetable/${id}/`); load();
+    try {
+        await axios.delete(`/api/timetable/${id}/`); 
+        load();
+    } catch (e) { console.error(e); }
   };
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
+  // 3. Loading Screen UI
+  if (pageLoading) {
+    return (
+      <div style={{
+        display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', flexDirection: 'column', color: '#555'
+      }}>
+        <div className="spinner" style={{
+           width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #3498db', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '15px'
+        }}></div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        <p>Loading Timetable...</p>
+      </div>
+    );
+  }
+
+  // 4. Main Content (Visible after 2s)
   return (
     <div style={{paddingBottom:'20px'}}>
       
-      {/* 1. Subject Manager (Top Fixed) */}
+      {/* Subject Manager */}
       <div className="card" style={{padding:'15px', marginBottom:'15px', borderLeft:'4px solid #27ae60'}}>
         <h4 style={{marginTop:0, marginBottom:'10px', color:'#27ae60'}}>Subjects</h4>
         <div style={{display:'flex', gap:'8px', marginBottom:'10px'}}>
@@ -61,12 +116,10 @@ export default function TimetableManager() {
         </div>
       </div>
 
-      {/* 2. Vertical Stack Layout (Mobile Friendly) */}
+      {/* Timetable Stack */}
       <div style={{display:'flex', flexDirection:'column', gap:'15px'}}>
         {days.map((d, i) => (
           <div key={d} className="card" style={{margin:0, padding:'15px', borderTop:'4px solid #3498db'}}>
-            
-            {/* Header: Day Name + Add Button */}
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'10px'}}>
                 <h3 style={{margin:0, color:'#2c3e50'}}>{d}</h3>
                 <select 
@@ -79,7 +132,6 @@ export default function TimetableManager() {
                 </select>
             </div>
             
-            {/* Class List */}
             {sched.filter(x=>x.day_of_week===i).length === 0 ? (
                 <div style={{padding:'10px', textAlign:'center', color:'#ccc', fontStyle:'italic', fontSize:'0.9rem', border:'1px dashed #eee', borderRadius:'6px'}}>
                     No classes scheduled

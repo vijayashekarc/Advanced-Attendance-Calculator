@@ -4,15 +4,43 @@ import axios from 'axios';
 export default function AnalysisDashboard() {
   const [subs, setSubs] = useState([]);
   const [report, setReport] = useState([]);
-  const [loading, setLoading] = useState(false);
+  
+  // 1. New state for the initial page load
+  const [pageLoading, setPageLoading] = useState(true);
+  
+  // Existing state for the "Analyze" button
+  const [analyzing, setAnalyzing] = useState(false);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    // 2. We wrap the initialization in a specific async function
+    const initPage = async () => {
+      setPageLoading(true);
 
-  const fetchData = async () => {
+      // 3. Run the Fetch AND the Timer at the same time
+      // The code will wait here until BOTH are finished.
+      await Promise.all([
+        fetchData(), 
+        new Promise(resolve => setTimeout(resolve, 1000)) // 2 Second Delay
+      ]);
+
+      setPageLoading(false);
+    };
+
+    initPage();
+  }, []);
+
+  const fetchData = async (retries = 3) => {
     try {
       const res = await axios.get('/api/subjects/');
       setSubs(res.data);
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      // Keep retry logic just in case, but the 2s delay usually fixes it
+      if (err.response && err.response.status === 401 && retries > 0) {
+        setTimeout(() => fetchData(retries - 1), 500);
+      } else {
+        console.error(err);
+      }
+    }
   };
 
   const handleInputChange = (id, field, value) => {
@@ -27,7 +55,7 @@ export default function AnalysisDashboard() {
   };
 
   const analyze = async () => {
-    setLoading(true);
+    setAnalyzing(true);
     const inputPayload = {};
     subs.forEach(s => {
         inputPayload[s.name] = { attended: s.attended_classes, conducted: s.conducted_classes };
@@ -37,12 +65,39 @@ export default function AnalysisDashboard() {
         const r = await axios.post('/api/analyze/', inputPayload);
         setReport(r.data);
     } catch (err) { alert("Error analyzing"); } 
-    finally { setLoading(false); }
+    finally { setAnalyzing(false); }
   };
 
+  // 4. THE LOADING SCREEN UI
+  if (pageLoading) {
+    return (
+      <div style={{
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '60vh', 
+        flexDirection: 'column',
+        color: '#555'
+      }}>
+        {/* Simple CSS Spinner */}
+        <div className="spinner" style={{
+           width: '40px',
+           height: '40px',
+           border: '4px solid #f3f3f3',
+           borderTop: '4px solid #3498db',
+           borderRadius: '50%',
+           animation: 'spin 1s linear infinite',
+           marginBottom: '15px'
+        }}></div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        <p>Loading Dashboard...</p>
+      </div>
+    );
+  }
+
+  // 5. The Real Content (Rendered only after 2s)
   return (
     <div>
-      {/* Input Section */}
       {subs.map(s => (
         <div key={s.id} className="card">
             <h3 style={{marginTop:0, fontSize:'1.1rem'}}>{s.name}</h3>
@@ -61,13 +116,12 @@ export default function AnalysisDashboard() {
       
       {subs.length === 0 && <p style={{textAlign:'center', color:'#888'}}>No subjects. Go to Timetable to add.</p>}
 
-      <button onClick={analyze} disabled={loading} className="btn-primary" style={{margin:'10px 0 25px 0'}}>
-        {loading ? 'Calculating...' : 'Analyze Attendance'}
+      <button onClick={analyze} disabled={analyzing} className="btn-primary" style={{margin:'10px 0 25px 0'}}>
+        {analyzing ? 'Calculating...' : 'Analyze Attendance'}
       </button>
 
-      {/* Results Section */}
       {report.map(r => {
-        let color = '#27ae60'; // Safe
+        let color = '#27ae60'; 
         if (r.status === 'Too Low' || r.status === 'Critical') color = '#e74c3c';
         if (r.status === 'Impossible') color = '#2c3e50';
 
@@ -81,7 +135,6 @@ export default function AnalysisDashboard() {
                     <b style={{fontSize:'1.1rem'}}>{r.subject}</b>
                     <span style={{color: color, fontWeight:'bold', fontSize:'0.9rem'}}>{r.status}</span>
                 </div>
-
                 <div style={{textAlign:'center', padding:'10px 0'}}>
                     <div style={{fontSize:'2.5rem', fontWeight:'800', color: color, lineHeight:1}}>
                         {r.status === 'Impossible' ? 'X' : r.bunkable}
@@ -90,11 +143,9 @@ export default function AnalysisDashboard() {
                         {r.bunkable >= 0 ? 'Bunks Available' : 'Recovery Needed'}
                     </small>
                 </div>
-
                 <p style={{background:'#f8f9fa', padding:'10px', borderRadius:'6px', fontSize:'0.9rem', color:'#555', fontStyle:'italic'}}>
                     "{r.advice}"
                 </p>
-
                 <div style={{marginTop:'15px', fontSize:'0.85rem', lineHeight: '1.8', borderTop:'1px solid #eee', paddingTop:'10px'}}>
                     <div style={{display:'flex', justifyContent:'space-between'}}>
                         <span>Current %:</span> <b>{r.current_percentage}%</b>
