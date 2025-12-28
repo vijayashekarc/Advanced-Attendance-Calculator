@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useGoogleLogin } from '@react-oauth/google';
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 function Login({ setToken }) {
   const [error, setError] = useState('');
