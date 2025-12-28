@@ -9,7 +9,7 @@ import axios from 'axios';
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const apiUrl = import.meta.env.VITE_API_URL; // <--- This reads the variable we will set
 
-axios.defaults.baseURL = apiUrl || '';
+axios.defaults.baseURL = 'https://advanced-attendance-calculator.vercel.app' || '';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
