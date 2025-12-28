@@ -4,9 +4,12 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css' // or App.css
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import axios from 'axios';
 
-// 1. Get the ID from the .env file
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const apiUrl = import.meta.env.VITE_API_URL; // <--- This reads the variable we will set
+
+axios.defaults.baseURL = apiUrl || '';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

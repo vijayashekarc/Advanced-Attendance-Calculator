@@ -10,28 +10,28 @@ export default function TimetableManager() {
 
   const load = async () => {
     try {
-        const s = await axios.get('http://127.0.0.1:8000/api/subjects/');
-        const t = await axios.get('http://127.0.0.1:8000/api/timetable/');
+        const s = await axios.get('/api/subjects/');
+        const t = await axios.get('/api/timetable/');
         setSubs(s.data); setSched(t.data);
     } catch (e) { console.error(e); }
   };
 
   const addSub = async () => {
     if(!newSub) return;
-    await axios.post('http://127.0.0.1:8000/api/subjects/', {name: newSub});
+    await axios.post('/api/subjects/', {name: newSub});
     setNewSub(''); load();
   };
 
   const delSub = async (id) => {
-    if(confirm("Delete subject?")) { await axios.delete(`http://127.0.0.1:8000/api/subjects/${id}/`); load(); }
+    if(confirm("Delete subject?")) { await axios.delete(`/api/subjects/${id}/`); load(); }
   };
 
   const addClass = async (day, subId) => {
-    await axios.post('http://127.0.0.1:8000/api/timetable/', {day_of_week: day, subject: subId}); load();
+    await axios.post('/api/timetable/', {day_of_week: day, subject: subId}); load();
   };
 
   const delClass = async (id) => {
-    await axios.delete(`http://127.0.0.1:8000/api/timetable/${id}/`); load();
+    await axios.delete(`/api/timetable/${id}/`); load();
   };
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];

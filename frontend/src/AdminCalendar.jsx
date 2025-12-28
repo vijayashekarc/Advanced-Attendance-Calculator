@@ -11,7 +11,7 @@ export default function AdminCalendar() {
 
   const fetchCal = async () => {
     try {
-        const res = await axios.get('http://127.0.0.1:8000/api/calendar/list/');
+        const res = await axios.get('/api/calendar/list/');
         const map = {};
         res.data.forEach(d => map[d.date] = d.is_working_day);
         setDates(map);
@@ -26,7 +26,7 @@ export default function AdminCalendar() {
     const dStr = format(date, 'yyyy-MM-dd');
     // Optimistic update (update UI instantly)
     setDates(prev => ({...prev, [dStr]: !prev[dStr]}));
-    await axios.post('http://127.0.0.1:8000/api/calendar/toggle/', {date: dStr});
+    await axios.post('/api/calendar/toggle/', {date: dStr});
   };
 
   const init = async () => {
@@ -37,7 +37,7 @@ export default function AdminCalendar() {
     
     try {
         // --- FIX IS HERE: MAPPING 'start' -> 'start_date' ---
-        await axios.post('http://127.0.0.1:8000/api/calendar/init/', {
+        await axios.post('/api/calendar/init/', {
             start_date: range.start,
             end_date: range.end
         });

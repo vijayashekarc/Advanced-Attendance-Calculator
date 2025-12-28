@@ -10,7 +10,7 @@ export default function AnalysisDashboard() {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/api/subjects/');
+      const res = await axios.get('/api/subjects/');
       setSubs(res.data);
     } catch (err) { console.error(err); }
   };
@@ -22,7 +22,7 @@ export default function AnalysisDashboard() {
   };
 
   const saveToDb = async (id, field, value) => {
-    try { await axios.patch(`http://127.0.0.1:8000/api/subjects/${id}/`, { [field]: value }); } 
+    try { await axios.patch(`/api/subjects/${id}/`, { [field]: value }); } 
     catch (err) { console.error(err); }
   };
 
@@ -34,7 +34,7 @@ export default function AnalysisDashboard() {
     });
 
     try {
-        const r = await axios.post('http://127.0.0.1:8000/api/analyze/', inputPayload);
+        const r = await axios.post('/api/analyze/', inputPayload);
         setReport(r.data);
     } catch (err) { alert("Error analyzing"); } 
     finally { setLoading(false); }

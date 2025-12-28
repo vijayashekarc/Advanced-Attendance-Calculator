@@ -8,7 +8,7 @@ function Login({ setToken }) {
   const googleLogin = useGoogleLogin({
     onSuccess: async (res) => {
       try {
-        const backendRes = await axios.post('http://127.0.0.1:8000/api/auth/google/', { access_token: res.access_token });
+        const backendRes = await axios.post('/api/auth/google/', { access_token: res.access_token });
         localStorage.setItem('token', backendRes.data.auth_token);
         setToken(backendRes.data.auth_token);
       } catch (err) { setError("Login Failed. Must use @klu.ac.in"); }
