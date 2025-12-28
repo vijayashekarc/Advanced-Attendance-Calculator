@@ -1,0 +1,24 @@
+# Core Django
+Django==5.0.1
+
+# API Framework
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+djoser==2.3.3
+
+# Database (Neon/Postgres)
+dj-database-url==2.1.0
+psycopg2-binary==2.9.9
+
+# Environment Variables
+python-dotenv==1.0.1
+
+# Static Files (Required for Vercel)
+whitenoise==6.6.0
+
+# HTTP Requests (Used for Google Auth verification)
+requests==2.31.0
+
+# Google Auth (If you used the social-auth library)
+social-auth-app-django==5.3.0
+
